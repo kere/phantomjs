@@ -1,7 +1,4 @@
-package phantomjs
 
-// shim is the included javascript used to communicate with PhantomJS.
-const shim = `
 var system = require("system")
 var webpage = require('webpage');
 var webserver = require('webserver');
@@ -166,11 +163,13 @@ function handleWebpageCreate(request, response) {
 }
 
 function handleWebpageOpen(request, response) {
+	// response.write(JSON.stringify(request));
+	// response.write("post:" + request.post);
   var msg = request.post;
   if(typeof request.post === 'string'){
     msg = JSON.parse(request.post);
   }
-  var page = ref(msg.ref);
+	var page = ref(msg.ref);
 
   page.onResourceRequested = function(requestData, pageRequest) {
     var resURL = requestData['url']
@@ -187,6 +186,7 @@ function handleWebpageOpen(request, response) {
     }
   };
 
+	// response.write("page open");
 	page.open(msg.url, function(status) {
 		response.write(JSON.stringify({status: status}));
 		response.closeGracefully();
@@ -654,7 +654,8 @@ function handleWebpageUploadFile(request, response) {
 
 function handleNotFound(request, response) {
 	response.statusCode = 404;
-	response.write(JSON.stringify({error:"not found"}));
+	// response.write(JSON.stringify({error:"not found"}));
+	response.write(JSON.stringify(request));
 	response.closeGracefully();
 }
 
@@ -699,4 +700,3 @@ function deleteRef(value) {
 function ref(id) {
 	return refs[id];
 }
-`
